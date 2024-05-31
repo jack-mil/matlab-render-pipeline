@@ -1,25 +1,45 @@
 %% DEFINE PARAMETERS
-LIGHT_LOC = [0,10,-5];
-CAM_LOC = [0, 1, -3];      
+% ------------------
+% Scene lighting
+LIGHT_LOC = [-10, 3, -4.5];     % Simple directional light (sun)
+% LIGHT_RGB = [1, 1, 1];      % White Light
+% LIGHT_RGB = [1, 0.75, 0.8]; % Soft Pink Light
+% LIGHT_RGB = [1, 0, 0];      % Red light
+% LIGHT_RGB = [1, 1, 0];      % Yellow light
+% Camb = [0.2, 0.2, 0.2];
+
+% Camera settings
+CAM_LOC = [0, 2, -5];      
 CAM_TARGET = [0, 0, 0];   
-
-OBJ_LOC = [0, 0, 0];  % Location of the object
-OBJ_ROT = deg2rad([0, 0, 0]);
-OBJ_SCALE = 0.5;
-
-% OBJ_RGB = [0.3010 0.7450 0.9330];  % Blue
-OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
-% OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
-% OBJ_RGB = [0.6350 0.0780 0.1840];  % Red
-
 FOV = 70;
 Z_NEAR = 0.1;
 Z_FAR = 1000;
 
-%% LOAD MODEL
+% Object transform
+OBJ_LOC = [0, 0, 0];
+OBJ_ROT = deg2rad([0, 0, 0]);
+OBJ_SCALE = 1;
 
-TL = stlread('cylinder_hi_poly.stl');
-points = resize(TL.Points', 4, FillValue=1)';   % Add the extra w = 1 dimention to make transformation easier
+% OBJ_RGB = [1,1,1];     % Grey / silver
+OBJ_RGB = [0.3010 0.7450 0.9330];  % Blue
+% OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
+% OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
+% OBJ_RGB = [0.6350 0.0780 0.1840];  % Red
+OBJ_Ks = [1, 1, 1];  % color of the specular light (gray
+OBJ_spec = 50;      % shininess
+Camb = OBJ_RGB .* 0.4;
+
+
+% Useful function handles
+normr = @(M) M ./ vecnorm(M, 2, 2);     % euclidean normalize every row
+
+
+
+%% LOAD MODEL
+% -----------
+
+TL = stlread('sphere_hip.stl');
+points = resize(TL.Points', 4, FillValue=1)';   % Add the extra w = 1 dimenstion to make transformation easier
 tris = TL.ConnectivityList;
 
 %% WORLD TRANSFORMATION
@@ -72,57 +92,42 @@ colors = zeros(length(points_T),3);
 % centers = zeros(length(tris),3);
 
 TL = triangulation(tris, points_T(:,1:3));
-V_norms = vertexNormal(TL);     % norm of each vertex (rows)
-L = LIGHT_LOC - points_T(:,1:3); % light vector for every vertex
-L = L ./ vecnorm(L, 2, 2);       % normalize each vector (euclidean, dim=2)
-tmp = dot(L, V_norms, 2);   % dot product of the row vectors (dim=2)
-Cdif = OBJ_RGB .* max(0,tmp);   % This is the vertex color
+N = vertexNormal(TL);     % norm of each vertex (rows)
 
-% for i = 1:size(tris, 1)
-%     % Get the vertex IDs for the ith facet
-%     vertex_ids = tris(i, :);
+L = LIGHT_LOC - points_T(:, 1:3); % light vector for each vertex
+V = CAM_LOC - points_T(:,1:3);      % view vector for each vertex
+
+L = normr(L);       % normalize each vector (euclidean, dim=2)
+V = normr(V);
+
+LN_dot = dot(L, N, 2);    % calculate angle of light and vertex normals
+
+Cdiff = OBJ_RGB .* max(0, LN_dot);
+
+R = 2.* LN_dot .* N - L;    % Reflection vector
+Cspec = OBJ_Ks .* max(0, dot(R, V, 2).^OBJ_spec) .* max(0, LN_dot);
+
+Ctot = Camb + Cdiff + Cspec;
+
+% figure(2)
 % 
-%     % 3x3 matrix, rows are the x,y,z,w of each vertex
-%     ver = points(vertex_ids, :);
-%     ver = resize(ver,[3,3]); % get rid of the ws (1)
+% trisurf(TL, FaceColor=[0.8,0.8,1])
+% % axis([-1.5 1.5 -1.5 1.5 -1.5 1.5]);
+% axis square;
+% hold on
+% % centers = num2cell(centers, 1);
+% % lights = num2cell(lights, 1);
+% % normals = num2cell(normals, 1);
 % 
-%     % surface normal for this tri
-%     N = cross(ver(2,:) - ver(1,:), ver(3,:) - ver(1,:));
-%     N = N / norm(N);
-%     normals(i, :) = N;
 % 
-%     center = mean(ver);
-%     centers(i, :) = center;
-%     L = LIGHT_LOC - center;
-%     L = L / norm(L);
-%     lights(i,:) = L;
-% 
-%     % V = CAM_LOC - center(1:3)
-%     % V = V / norm(V);
-%     tmp = dot(N, L);
-%     Cdif = OBJ_RGB*max(0, tmp);
-%     colors(i, :) = Cdif;
-% end
-
-figure(2)
-
-trisurf(TL, FaceColor=[0.8,0.8,1])
-% axis([-1.5 1.5 -1.5 1.5 -1.5 1.5]);
-axis square;
-hold on
-% centers = num2cell(centers, 1);
-% lights = num2cell(lights, 1);
-% normals = num2cell(normals, 1);
-
-
-V_norms = num2cell(V_norms, 1);
-quiver3(points_T(:,1),points_T(:,2),points_T(:, 3), ...
-    V_norms{:}, color='g');
+% V_norms = num2cell(V_norms, 1);
+% quiver3(points_T(:,1),points_T(:,2),points_T(:, 3), ...
+%     V_norms{:}, color='g');
 % quiver3(centers{:}, ...
 %     normals{:}, Color='r')
 % quiver3(centers{:}, ...
 %     lights{:}, Color='b')
-hold off
+% hold off
 
 %% VIEW TRANSFORMATION
 % -------------------
@@ -159,13 +164,23 @@ sorted_tris = sortrows(aug, 1, "descend");   % sort based on first column
 
 %% RESTERIZATION
 % --------------
-figure(3)
-clf(3)
 
-% patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", sorted_tris(:,5:7), "FaceColor", "flat", "EdgeColor", "none");
-patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Cdif, "FaceColor", "interp", "EdgeColor", "none");
+% f1=figure(1);
+% patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceColor" , Camb, "EdgeColor", "none");
+% axis([-1 1 -1 1]);
+% axis square;
+% f2=figure(2);
+% patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Cdiff, "FaceColor", "interp", "EdgeColor", "none");
+% axis([-1 1 -1 1]);
+% axis square;
+% f3=figure(3);
+% patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Cspec, "FaceColor", "interp", "EdgeColor", "none");
+% axis([-1 1 -1 1]);
+% axis square;
+f4=figure(4);
+patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Ctot, "FaceColor", "interp", "EdgeColor", "none");
+axis([-1 1 -1 1]);axis square;
 
-axis([-1 1 -1 1]);
-axis square;
+
 
 
