@@ -17,8 +17,8 @@ Z_FAR = 1000;
 
 % Object transform
 OBJ_LOC = [0, 0, 0];
-OBJ_ROT = deg2rad([0, 0, 0]);
-OBJ_SCALE = 1;
+OBJ_ROT = deg2rad([90, 0, 0]);
+OBJ_SCALE = 4;
 
 % Object material
 OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
@@ -36,7 +36,7 @@ normr = @(M) M ./ vecnorm(M, 2, 2); % Euclidean normalize every row
 %% LOAD MODEL
 % -----------
 
-TL = stlread('teapot.stl');
+TL = stlread('suzanne_hip.stl');
 % Add the extra w = 1 dimension to make transformation easier.
 points = resize(TL.Points', 4, FillValue = 1)';
 tris = TL.ConnectivityList;
@@ -94,9 +94,10 @@ points_view = points_T * MatrixLookAtRH(CAM_LOC, CAM_TARGET);
 %% PROJECTION TRANSFORMATION
 % -------------------------
 
-points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR);
+% points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR);
 % Perform the perspective divide operation
-points_proj = points_proj ./ points_proj(:, 4);
+% points_proj = points_proj ./ points_proj(:, 4);
+points_proj = points_view * MatrixOrthoRH(6, 6, Z_NEAR, Z_FAR);
 
 %% Z SORTING
 % ----------
@@ -125,6 +126,6 @@ sorted_tris = sortrows([avg_z, tris], 1, "descend"); % Sort based on avg_z (col 
 % axis([-1 1 -1 1]);
 % axis square;
 clf
-f4 = figure(4);
+figure(1);
 patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Ctot, "FaceColor", "interp", "EdgeColor", "none");
 axis([-1 1 -1 1]); axis square;
