@@ -12,9 +12,10 @@ function [matrix] = MatrixPerspectiveFovRH(fov, z_near, z_far)
     fovy = deg2rad(fov);
 
     yScale = cot(fovy / 2);
-    xScale = yScale;
+    xScale = yScale;    % aspect ratio = 1 
     z_diff = z_near - z_far;
 
+    % construct the matrix
     matrix = diag([xScale yScale]);
     matrix(3:4, 3:4) = [z_far / z_diff, -1;
                        z_near * z_far / z_diff, 0];

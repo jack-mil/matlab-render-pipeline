@@ -9,10 +9,10 @@ function [matrix] = MatrixLookAtRH(loc, target, up)
         up(1, 3) double = [0, 1, 0];
     end
 
-    zaxis = loc - target; % normalize
-    zaxis = zaxis / norm(zaxis);
-    xaxis = cross(up, zaxis);
-    xaxis = xaxis / norm(xaxis);
+    normr = @(M) M ./ vecnorm(M, 2, 2);
+
+    zaxis = normr(loc - target);
+    xaxis = normr(cross(up, zaxis));
     yaxis = cross(zaxis, xaxis);
 
     matrix = [xaxis; yaxis; zaxis; zeros(1, 3)];
