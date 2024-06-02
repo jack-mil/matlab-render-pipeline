@@ -1,45 +1,56 @@
+%% LOAD MODEL
+% -----------
+
+TL = stlread('sphere_hip.stl');
+% Add the extra w = 1 dimension to make transformation easier.
+points = resize(TL.Points', 4, FillValue = 1)';
+tris = TL.ConnectivityList;
+
 %% DEFINE PARAMETERS
 % ------------------
 % Scene lighting
-LIGHT_LOC = [-10, 3, -4.5]; % Simple directional light (sun)
-LIGHT_RGB = [1, 1, 1];      % White Light
+LIGHT1_LOC = [5, 2.5, -5]; % Key light
+LIGHT1_RGB = [1, 1, 1];
+
+LIGHT2_LOC = [-5, 2.5, -5]; % Fill light
+LIGHT2_RGB = [0.7, 0.7, 0.7];
+
+LIGHT3_LOC = [-5, 3, 5]; % Backlight
+% LIGHT3_RGB = [0.3, 0, 0.2];     % Weird reddish underglow
+LIGHT3_RGB = [0.3, 0.3, 0.3];
+
+Ls = cat(3, LIGHT1_LOC, LIGHT2_LOC, LIGHT3_LOC);
+L_RGBs = cat(3, LIGHT1_RGB, LIGHT2_RGB, LIGHT3_RGB);
+
 % LIGHT_RGB = [1, 0.75, 0.8]; % Soft Pink Light
 % LIGHT_RGB = [1, 0, 0];      % Red light
 % LIGHT_RGB = [1, 1, 0];      % Yellow light
-% Camb = [0.2, 0.2, 0.2];
+Camb = [0, 0, 0]; % No ambient light
 
 % Camera settings
-CAM_LOC = [0, 2, -5];
+orbit = @(a,d,y) [d*cos(deg2rad(270+a)), y, d*sin(deg2rad(270+a))];
+CAM_LOC = orbit(0, 5, 0);
+% CAM_LOC = [0, 0, -5];
 CAM_TARGET = [0, 0, 0];
-FOV = 70;
+FOV = 39.6; % 50mm
 Z_NEAR = 0.1;
 Z_FAR = 1000;
 
 % Object transform
 OBJ_LOC = [0, 0, 0];
 OBJ_ROT = deg2rad([90, 0, 0]);
-OBJ_SCALE = 4;
+OBJ_SCALE = 1;
 
 % Object material
-OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
-% OBJ_RGB = [1,1,1];     % Grey / silver
+% OBJ_RGB = [0.3,0.31,0.24];
+% OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
+% OBJ_RGB = [1, 0.8393, 0];     % Gold
 % OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
 % OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
-% OBJ_RGB = [0.6350 0.0780 0.1840];  % Red
-OBJ_Ks = [1, 1, 1]; % Color of the specular highlights
-OBJ_spec = 50; % Shininess constant
-Camb = OBJ_RGB .* 0.4;  % Ambient light color
-
-% Useful function handles
-normr = @(M) M ./ vecnorm(M, 2, 2); % Euclidean normalize every row
-
-%% LOAD MODEL
-% -----------
-
-TL = stlread('suzanne_hip.stl');
-% Add the extra w = 1 dimension to make transformation easier.
-points = resize(TL.Points', 4, FillValue = 1)';
-tris = TL.ConnectivityList;
+OBJ_RGB = [0.6350 0.0780 0.1840];  % Red
+OBJ_Ks = OBJ_RGB; % Color of the specular highlights
+% OBJ_Ks = [1,1,1];
+OBJ_spec = 80; % Shininess constant
 
 %% WORLD TRANSFORMATION
 % --------------------
@@ -68,23 +79,30 @@ points_T = points * M_Scale * M_Translate * M_Rot;
 % Gouraud shading with Phong reflection model from
 % https://en.wikipedia.org/wiki/Phong_reflection_model
 
+% Useful function handles
+normr = @(M) M ./ vecnorm(M, 2, 2); % Euclidean normalize every row
+dotr = @(T, M) sum(T .* M, 2); % Take a dot product of rows in M and T, across pages of T
+
 % Reconstruct the tri object for vertexNormal function
-N = vertexNormal(triangulation(tris, points_T(:, 1:3))); % Norm of each vertex (rows)
+N = vertexNormal(triangulation(tris, points_T(:, 1:3))); % Normal of each vertex (rows)
 
-L = normr(LIGHT_LOC - points_T(:, 1:3));    % Unit light vector of each vertex
-V = normr(CAM_LOC - points_T(:, 1:3));      % Unit view vector of each vertex
+L = normr(Ls - points_T(:, 1:3)); % Unit light vector of each vertex
+V = normr(CAM_LOC - points_T(:, 1:3)); % Unit view vector of each vertex
 
-LN_dot = dot(L, N, 2); % angle b/w/ normal and incoming light
+% LN_dot = dot(L, cat(3,N,N), 2); % angle b/w/ normal and incoming light
+% LN_dot = pagemtimes(N, pagetranspose(Ls));
+LN_dot = dotr(L, N);
 
-Cdiff = LIGHT_RGB .* OBJ_RGB .* max(0, LN_dot);  % Calculate diffuse color
+Cdiff = L_RGBs .* OBJ_RGB .* max(0, LN_dot); % Calculate diffuse color
 
 R = 2 .* LN_dot .* N - L; % Reflection vector
 
 % Calculate specular highlights
 % Specular only present when diffuse is non-zero
-Cspec = LIGHT_RGB .* OBJ_Ks .* max(0, dot(R, V, 2) .^ OBJ_spec) .* (Cdiff>0);
+% Cspec = L_RGBs .* OBJ_Ks .* max(0, dot(R, cat(3,V,V), 2) .^ OBJ_spec) .* (Cdiff>0);
+Cspec = L_RGBs .* OBJ_Ks .* max(0, dotr(R, V) .^ OBJ_spec) .* (Cdiff > 0);
 
-Ctot = Camb + Cdiff + Cspec;
+Ctot = Camb + sum(Cdiff, 3) + sum(Cspec, 3);
 
 %% VIEW TRANSFORMATION
 % -------------------
@@ -94,10 +112,10 @@ points_view = points_T * MatrixLookAtRH(CAM_LOC, CAM_TARGET);
 %% PROJECTION TRANSFORMATION
 % -------------------------
 
-% points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR);
 % Perform the perspective divide operation
-% points_proj = points_proj ./ points_proj(:, 4);
-points_proj = points_view * MatrixOrthoRH(6, 6, Z_NEAR, Z_FAR);
+points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR);
+points_proj = points_proj ./ points_proj(:, 4);
+% points_proj = points_view * MatrixOrthoRH(3, 3, Z_NEAR, Z_FAR);
 
 %% Z SORTING
 % ----------
