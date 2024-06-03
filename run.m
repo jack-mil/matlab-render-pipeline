@@ -1,7 +1,7 @@
 %% LOAD MODEL
 % -----------
 
-TL = stlread('sphere_hip.stl');
+TL = stlread('suzanne_hip.stl');
 % Add the extra w = 1 dimension to make transformation easier.
 points = resize(TL.Points', 4, FillValue = 1)';
 tris = TL.ConnectivityList;
@@ -33,6 +33,7 @@ CAM_LOC = orbit(0, 5, 0);
 % CAM_LOC = [0, 0, -5];
 CAM_TARGET = [0, 0, 0];
 FOV = 39.6; % 50mm
+WH_RATIO = [4,3];    % Aspect ratio
 Z_NEAR = 0.1;
 Z_FAR = 1000;
 
@@ -78,6 +79,7 @@ points_T = points * M_Scale * M_Translate * M_Rot;
 
 % Gouraud shading with Phong reflection model from
 % https://en.wikipedia.org/wiki/Phong_reflection_model
+% https://en.wikipedia.org/wiki/Gouraud_shading
 
 % Useful function handles
 normr = @(M) M ./ vecnorm(M, 2, 2); % Euclidean normalize every row
@@ -102,6 +104,7 @@ R = 2 .* LN_dot .* N - L; % Reflection vector
 % Cspec = L_RGBs .* OBJ_Ks .* max(0, dot(R, cat(3,V,V), 2) .^ OBJ_spec) .* (Cdiff>0);
 Cspec = L_RGBs .* OBJ_Ks .* max(0, dotr(R, V) .^ OBJ_spec) .* (Cdiff > 0);
 
+% Add the effect of all lights together (3-dimension array)
 Ctot = Camb + sum(Cdiff, 3) + sum(Cspec, 3);
 
 %% VIEW TRANSFORMATION
@@ -113,7 +116,7 @@ points_view = points_T * MatrixLookAtRH(CAM_LOC, CAM_TARGET);
 % -------------------------
 
 % Perform the perspective divide operation
-points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR);
+points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR, WH_RATIO);
 points_proj = points_proj ./ points_proj(:, 4);
 % points_proj = points_view * MatrixOrthoRH(3, 3, Z_NEAR, Z_FAR);
 
@@ -146,4 +149,8 @@ sorted_tris = sortrows([avg_z, tris], 1, "descend"); % Sort based on avg_z (col 
 clf
 figure(1);
 patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Ctot, "FaceColor", "interp", "EdgeColor", "none");
-axis([-1 1 -1 1]); axis square;
+
+% Configure figure and plot dimensions
+set(gca,"Color", [0.4,0.4,0.4]);
+set(gcf, "Color",[0.8,0.8,0.8]);
+axis([-1 1 -1 1]); pbaspect([WH_RATIO, 1])
