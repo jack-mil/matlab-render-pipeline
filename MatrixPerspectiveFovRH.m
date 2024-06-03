@@ -20,6 +20,6 @@ function [matrix] = MatrixPerspectiveFovRH(fov, z_near, z_far, wh_ratio)
     % construct the matrix
     matrix = diag([xScale yScale]);
     matrix(3:4, 3:4) = [z_far / z_diff, -1;
-                       z_near * z_far / z_diff, 0];
+                        z_near * z_far / z_diff, 0];
 
 end

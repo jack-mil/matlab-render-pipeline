@@ -9,11 +9,11 @@ tris = TL.ConnectivityList;
 %% DEFINE PARAMETERS
 % ------------------
 % Scene lighting
-LIGHT1_LOC = [5, 2.5, -5]; % Key light
+LIGHT1_LOC = [5, 3, -5]; % Key light
 LIGHT1_RGB = [1, 1, 1];
 
-LIGHT2_LOC = [-5, 2.5, -5]; % Fill light
-LIGHT2_RGB = [0.7, 0.7, 0.7];
+LIGHT2_LOC = [-4, 2.5, -4]; % Fill light
+LIGHT2_RGB = [0.8, 0.8, 0.8];
 
 LIGHT3_LOC = [-5, 3, 5]; % Backlight
 % LIGHT3_RGB = [0.3, 0, 0.2];     % Weird reddish underglow
@@ -28,12 +28,12 @@ L_RGBs = cat(3, LIGHT1_RGB, LIGHT2_RGB, LIGHT3_RGB);
 Camb = [0, 0, 0]; % No ambient light
 
 % Camera settings
-orbit = @(a,d,y) [d*cos(deg2rad(270+a)), y, d*sin(deg2rad(270+a))];
+orbit = @(a, d, y) [d * cos(deg2rad(270 + a)), y, d * sin(deg2rad(270 + a))];
 CAM_LOC = orbit(0, 5, 0);
 % CAM_LOC = [0, 0, -5];
 CAM_TARGET = [0, 0, 0];
 FOV = 39.6; % 50mm
-WH_RATIO = [4,3];    % Aspect ratio
+WH_RATIO = [4, 3]; % Aspect ratio
 Z_NEAR = 0.1;
 Z_FAR = 1000;
 
@@ -48,7 +48,7 @@ OBJ_SCALE = 1;
 % OBJ_RGB = [1, 0.8393, 0];     % Gold
 % OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
 % OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
-OBJ_RGB = [0.6350 0.0780 0.1840];  % Red
+OBJ_RGB = [0.6350 0.0780 0.1840]; % Red
 OBJ_Ks = OBJ_RGB; % Color of the specular highlights
 % OBJ_Ks = [1,1,1];
 OBJ_spec = 80; % Shininess constant
@@ -151,6 +151,6 @@ figure(1);
 patch('Faces', sorted_tris(:, 2:4), "Vertices", points_proj(:, 1:2), "FaceVertexCData", Ctot, "FaceColor", "interp", "EdgeColor", "none");
 
 % Configure figure and plot dimensions
-set(gca,"Color", [0.4,0.4,0.4]);
-set(gcf, "Color",[0.8,0.8,0.8]);
+set(gca, "Color", [0.4, 0.4, 0.4]);
+set(gcf, "Color", [0.8, 0.8, 0.8]);
 axis([-1 1 -1 1]); pbaspect([WH_RATIO, 1])
