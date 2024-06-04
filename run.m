@@ -91,8 +91,6 @@ N = vertexNormal(triangulation(tris, points_T(:, 1:3))); % Normal of each vertex
 L = normr(Ls - points_T(:, 1:3)); % Unit light vector of each vertex
 V = normr(CAM_LOC - points_T(:, 1:3)); % Unit view vector of each vertex
 
-% LN_dot = dot(L, cat(3,N,N), 2); % angle b/w/ normal and incoming light
-% LN_dot = pagemtimes(N, pagetranspose(Ls));
 LN_dot = dotr(L, N);
 
 Cdiff = L_RGBs .* OBJ_RGB .* max(0, LN_dot); % Calculate diffuse color
@@ -101,7 +99,6 @@ R = 2 .* LN_dot .* N - L; % Reflection vector
 
 % Calculate specular highlights
 % Specular only present when diffuse is non-zero
-% Cspec = L_RGBs .* OBJ_Ks .* max(0, dot(R, cat(3,V,V), 2) .^ OBJ_spec) .* (Cdiff>0);
 Cspec = L_RGBs .* OBJ_Ks .* max(0, dotr(R, V) .^ OBJ_spec) .* (Cdiff > 0);
 
 % Add the effect of all lights together (3-dimension array)
