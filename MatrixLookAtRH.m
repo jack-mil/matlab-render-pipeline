@@ -15,6 +15,6 @@ function [matrix] = MatrixLookAtRH(loc, target, up)
     xaxis = normr(cross(up, zaxis));
     yaxis = cross(zaxis, xaxis);
 
-    matrix = [xaxis; yaxis; zaxis; zeros(1, 3)];
+    matrix = [xaxis; yaxis; zaxis;];
     matrix(4, 1:4) = [-dot(xaxis, loc), -dot(yaxis, loc) -dot(zaxis, loc), 1];
 end

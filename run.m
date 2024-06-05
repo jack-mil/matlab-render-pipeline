@@ -72,7 +72,7 @@ rotz = @(a) [cos(a), -sin(a), 0, 0; sin(a), cos(a), 0, 0; 0, 0, 1, 0; 0, 0, 0, 1
 M_Rot = rotx(OBJ_ROT(1)) * roty(OBJ_ROT(2)) * rotz(OBJ_ROT(3));
 
 % Do the world transformation
-points_T = points * M_Scale * M_Translate * M_Rot;
+points_T = points * M_Rot * M_Scale * M_Translate;
 
 %% LIGHTING CALCULATIONS (in world space)
 % ----------------------
@@ -104,18 +104,19 @@ Cspec = L_RGBs .* OBJ_Ks .* max(0, dotr(R, V) .^ OBJ_spec) .* (Cdiff > 0);
 % Add the effect of all lights together (3-dimension array)
 Ctot = Camb + sum(Cdiff, 3) + sum(Cspec, 3);
 
-%% VIEW TRANSFORMATION
+%% VIEW TRANSFORMATION (RH)
 % -------------------
 
 points_view = points_T * MatrixLookAtRH(CAM_LOC, CAM_TARGET);
 
-%% PROJECTION TRANSFORMATION
+%% PROJECTION TRANSFORMATION (RH)
 % -------------------------
 
 % Perform the perspective divide operation
 points_proj = points_view * MatrixPerspectiveFovRH(FOV, Z_NEAR, Z_FAR, WH_RATIO);
 points_proj = points_proj ./ points_proj(:, 4);
-% points_proj = points_view * MatrixOrthoRH(3, 3, Z_NEAR, Z_FAR);
+% Optional ortho projection
+% points_proj = points_view * MatrixOrthoRH(WH_RATIO(1), WH_RATIO(2), Z_NEAR, Z_FAR);
 
 %% Z SORTING
 % ----------
