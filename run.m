@@ -1,57 +1,58 @@
-%% LOAD MODEL
-% -----------
-
-TL = stlread('suzanne_hip.stl');
-% Add the extra w = 1 dimension to make transformation easier.
-points = resize(TL.Points', 4, FillValue = 1)';
-tris = TL.ConnectivityList;
-
 %% DEFINE PARAMETERS
 % ------------------
+model_file = 'suzanne_hip.stl';
+% Object transform
+OBJ_LOC = [0, 0, 0];
+OBJ_ROT = deg2rad([-90, 0, 180]);
+OBJ_SCALE = 1.333;
+
+% Object material
+OBJ_RGB = [0.8,0.8,0.8];    % White
+% OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
+% OBJ_RGB = [1, 0.8393, 0];     % Gold
+% OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
+% OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
+% OBJ_RGB = [0.6350 0.0780 0.1840]; % Red
+OBJ_Ks = OBJ_RGB; % Color of the specular highlights
+% OBJ_Ks = [1,1,1];
+OBJ_spec = 150; % Shininess constant
+
 % Scene lighting
-LIGHT1_LOC = [5, 3, -5]; % Key light
+LIGHT1_LOC = [5, 3, 5]; % Key light
 LIGHT1_RGB = [1, 1, 1];
 
-LIGHT2_LOC = [-4, 2.5, -4]; % Fill light
+LIGHT2_LOC = [-5, 2, 4]; % Fill light
 LIGHT2_RGB = [0.8, 0.8, 0.8];
 
-LIGHT3_LOC = [-5, 3, 5]; % Backlight
-% LIGHT3_RGB = [0.3, 0, 0.2];     % Weird reddish underglow
-LIGHT3_RGB = [0.3, 0.3, 0.3];
+LIGHT3_LOC = [-5, 3, -5]; % Backlight
+% LIGHT3_RGB = [0.3, 0.3, 0.3];
+LIGHT3_RGB = [0.6, 0, 0.4];     % Weird reddish underglow
 
-Ls = cat(3, LIGHT1_LOC, LIGHT2_LOC, LIGHT3_LOC);
-L_RGBs = cat(3, LIGHT1_RGB, LIGHT2_RGB, LIGHT3_RGB);
+LIGHT4_LOC = [5,3,-5]
+LIGHT4_RGB = [0,0.6,0.4];
 
-% LIGHT_RGB = [1, 0.75, 0.8]; % Soft Pink Light
-% LIGHT_RGB = [1, 0, 0];      % Red light
-% LIGHT_RGB = [1, 1, 0];      % Yellow light
+% Add all the lights and colors into multidimensional arrays
+Ls = cat(3, LIGHT1_LOC, LIGHT2_LOC, LIGHT3_LOC, LIGHT4_LOC);
+L_RGBs = cat(3, LIGHT1_RGB, LIGHT2_RGB, LIGHT3_RGB, LIGHT4_RGB);
+
 Camb = [0, 0, 0]; % No ambient light
 
 % Camera settings
 orbit = @(a, d, y) [d * cos(deg2rad(270 + a)), y, d * sin(deg2rad(270 + a))];
-CAM_LOC = orbit(0, 5, 0);
-% CAM_LOC = [0, 0, -5];
+% CAM_LOC = orbit(0, 5, 0);
+CAM_LOC = [0, 0, 5];
 CAM_TARGET = [0, 0, 0];
 FOV = 39.6; % 50mm
 WH_RATIO = [4, 3]; % Aspect ratio
 Z_NEAR = 0.1;
 Z_FAR = 1000;
 
-% Object transform
-OBJ_LOC = [0, 0, 0];
-OBJ_ROT = deg2rad([90, 0, 0]);
-OBJ_SCALE = 1;
-
-% Object material
-% OBJ_RGB = [0.3,0.31,0.24];
-% OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
-% OBJ_RGB = [1, 0.8393, 0];     % Gold
-% OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
-% OBJ_RGB = [0.4660 0.6740 0.1880];  % Green
-OBJ_RGB = [0.6350 0.0780 0.1840]; % Red
-OBJ_Ks = OBJ_RGB; % Color of the specular highlights
-% OBJ_Ks = [1,1,1];
-OBJ_spec = 80; % Shininess constant
+%% LOAD MODEL
+% -----------
+TL = stlread(model_file);
+% Add the extra w = 1 dimension to make transformation easier.
+points = resize(TL.Points', 4, FillValue = 1)';
+tris = TL.ConnectivityList;
 
 %% WORLD TRANSFORMATION
 % --------------------
