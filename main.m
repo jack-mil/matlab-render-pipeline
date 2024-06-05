@@ -1,6 +1,6 @@
 %% DEFINE PARAMETERS
 % ------------------
-model_file = 'suzanne_hip.stl';
+MODEL_FILE = 'suzanne_hip.stl';
 % Object transform
 OBJ_LOC = [0, 0, 0];
 OBJ_ROT = deg2rad([-90, 0, 180]);
@@ -35,11 +35,11 @@ LIGHT4_RGB = [0, 0.6, 0.4]; % Cyanish
 Ls = cat(3, LIGHT1_LOC, LIGHT2_LOC, LIGHT3_LOC, LIGHT4_LOC);
 L_RGBs = cat(3, LIGHT1_RGB, LIGHT2_RGB, LIGHT3_RGB, LIGHT4_RGB);
 
-Camb = [0, 0, 0]; % No ambient light
+AMB_RGB = [0, 0, 0]; % No ambient light
 
 % Camera settings
 orbit = @(a, d, y) [d * cos(deg2rad(270 + a)), y, d * sin(deg2rad(270 + a))];
-% CAM_LOC = orbit(0, 5, 0);
+% CAM_LOC = orbit(0, 5, 0);     % use this function to use polar coords
 CAM_LOC = [0, 0, 5];
 CAM_TARGET = [0, 0, 0];
 FOV = 39.6; % 50mm
@@ -49,7 +49,7 @@ Z_FAR = 1000;
 
 %% LOAD MODEL
 % -----------
-TL = stlread(model_file);
+TL = stlread(MODEL_FILE);
 % Add the extra w = 1 dimension to make transformation easier.
 points = resize(TL.Points', 4, FillValue = 1)';
 tris = TL.ConnectivityList;

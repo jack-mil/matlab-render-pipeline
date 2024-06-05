@@ -1,18 +1,7 @@
-normals+lights.png filter=lfs diff=lfs merge=lfs -text
-sphere_red_rough.png filter=lfs diff=lfs merge=lfs -text
-sphere_red_underglow.png filter=lfs diff=lfs merge=lfs -text
-suzanne_studio.png filter=lfs diff=lfs merge=lfs -text
-utah_teapot_smooth.png filter=lfs diff=lfs merge=lfs -text
-gross_normals.png filter=lfs diff=lfs merge=lfs -text
-sphere_phong.png filter=lfs diff=lfs merge=lfs -text
-sphere_studio.png filter=lfs diff=lfs merge=lfs -text
-suzanne_ortho_studio.png filter=lfs diff=lfs merge=lfs -text
-utah_teapot.png filter=lfs diff=lfs merge=lfs -text
-sphere_hip.stl filter=lfs diff=lfs merge=lfs -text
-teapot_hip.stl filter=lfs diff=lfs merge=lfs -text
-teapot_studio.png filter=lfs diff=lfs merge=lfs -text
-suzanne_hip.stl filter=lfs diff=lfs merge=lfs -text
-scene.blend filter=lfs diff=lfs merge=lfs -text
+
+
 *.stl filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
