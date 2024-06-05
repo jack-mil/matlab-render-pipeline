@@ -7,7 +7,7 @@ OBJ_ROT = deg2rad([-90, 0, 180]);
 OBJ_SCALE = 1.333;
 
 % Object material
-OBJ_RGB = [0.8,0.8,0.8];    % White
+OBJ_RGB = [0.8, 0.8, 0.8]; % White
 % OBJ_RGB = [0.3010 0.7450 0.9330]; % Blue
 % OBJ_RGB = [1, 0.8393, 0];     % Gold
 % OBJ_RGB = [0.8500 0.3250 0.0980];  % Orange
@@ -26,10 +26,10 @@ LIGHT2_RGB = [0.8, 0.8, 0.8];
 
 LIGHT3_LOC = [-5, 3, -5]; % Backlight
 % LIGHT3_RGB = [0.3, 0.3, 0.3];
-LIGHT3_RGB = [0.6, 0, 0.4];     % Weird reddish underglow
+LIGHT3_RGB = [0.6, 0, 0.4]; % Pinkish
 
-LIGHT4_LOC = [5,3,-5]
-LIGHT4_RGB = [0,0.6,0.4];
+LIGHT4_LOC = [5, 3, -5];
+LIGHT4_RGB = [0, 0.6, 0.4]; % Cyanish
 
 % Add all the lights and colors into multidimensional arrays
 Ls = cat(3, LIGHT1_LOC, LIGHT2_LOC, LIGHT3_LOC, LIGHT4_LOC);
