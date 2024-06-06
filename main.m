@@ -1,6 +1,6 @@
 %% DEFINE PARAMETERS
 % ------------------
-MODEL_FILE = 'suzanne_hip.stl';
+MODEL_FILE = 'models/suzanne_hip.stl';
 % Object transform
 OBJ_LOC = [0, 0, 0];
 OBJ_ROT = deg2rad([-90, 0, 180]);
@@ -103,7 +103,7 @@ R = 2 .* LN_dot .* N - L; % Reflection vector
 Cspec = L_RGBs .* OBJ_Ks .* max(0, dotr(R, V) .^ OBJ_spec) .* (Cdiff > 0);
 
 % Add the effect of all lights together (3-dimension array)
-Ctot = Camb + sum(Cdiff, 3) + sum(Cspec, 3);
+Ctot = AMB_RGB + sum(Cdiff, 3) + sum(Cspec, 3);
 
 %% VIEW TRANSFORMATION (RH)
 % -------------------
