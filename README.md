@@ -29,3 +29,7 @@ gifski -r 30 --extra -Q100 -W728 --repeat 4 -o spin.gif frames/*.png
 
 ffmpeg -framerate 30 -i 'frames/frame%03d.png' -pix_fmt yuv420p -c:v libx264 -preset veryslow -crf 18 -movflags +faststart -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" spin.mp4
 ```
+
+Utah teapot from ![Wikipedia, under CC0 Public Domain](https://wikipedia.org/wiki/File%3AUtah_teapot_%28solid%29.stl)
+
+All other models created by me in Blender.

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 jack-mil
+%
+% SPDX-License-Identifier: BSD-3-Clause
+
 function [matrix] = MatrixLookAtRH(loc, target, up)
     %MATRIXLOOKATRH Return a matrix for the camera look at transformation
     %   loc: Position of the camera

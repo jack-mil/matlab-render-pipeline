@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 jack-mil
+%
+% SPDX-License-Identifier: BSD-3-Clause
+
 function [matrix] = MatrixPerspectiveFovRH(fov, z_near, z_far, wh_ratio)
     %MATRIXPERSPECTIVEFOVRH Return a matrix for the perspective view transform
     %   fov: Field-of-View in degrees

@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 jack-mil
+%
+% SPDX-License-Identifier: BSD-3-Clause
+
 function [matrix] = MatrixOrthoRH(w, h, z_near, z_far)
     %MATRIXPERSPECTIVEFOVRH Return a matrix for the orthographic projection transform
     %   w: Width of the view volume

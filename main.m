@@ -1,3 +1,7 @@
+% SPDX-FileCopyrightText: 2024 jack-mil
+%
+% SPDX-License-Identifier: BSD-3-Clause
+
 %% DEFINE PARAMETERS
 % ------------------
 MODEL_FILE = 'models/suzanne_hip.stl';
