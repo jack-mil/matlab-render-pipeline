@@ -32,11 +32,18 @@
 ![grey torus](images/torus.png)
 
 
-Animation made by rendering frames and encoding with ffmpeg and gifksi
+Animation made by rendering frames and encoding in various formats with ffmpeg and gifksi.
+All actual video formats compress better then the gif, even when lossless. I wish GitHub 
+allowed auto-playback of webm/vp9 in embedded markdown.
 ```bash
 gifski -r 30 --extra -Q100 -W728 --repeat 4 -o spin.gif frames/*.png
 
 ffmpeg -framerate 30 -i 'frames/frame%03d.png' -pix_fmt yuv420p -c:v libx264 -preset veryslow -crf 18 -movflags +faststart -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" spin.mp4
+
+ffmpeg -framerate 30 -i frames/frame%03d.png -pix_fmt yuv420p -c:v libvpx-vp9 -b:v 0 -crf 31 -pass 1 -f null /dev/null && \
+ffmpeg -framerate 30 -i frames/frame%03d.png -pix_fmt yuv420p -c:v libvpx-vp9 -b:v 0 -crf 31 -pass 2 images/spin-2pass.webm
+
+ffmpeg -framerate 30 -i frames/frame%03d.png -pix_fmt yuv420p -c:v libvpx-vp9 -lossless 1 images/spin-lossless.webm
 ```
 
 Utah Teapot from ![Wikipedia, under CC0 Public Domain](https://wikipedia.org/wiki/File%3AUtah_teapot_%28solid%29.stl)
