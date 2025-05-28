@@ -11,7 +11,7 @@
 
 ## Images
 
-![rotating suzanne gif](images/spin.gif)
+<video autoplay muted width="728" src="https://github.com/user-attachments/assets/8239f0e4-b806-4626-a500-0c82bb611e49"></video>
 
 ![specular & diffuse shading](images/sphere_phong.png)
 
